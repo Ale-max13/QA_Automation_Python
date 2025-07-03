@@ -1,11 +1,7 @@
 def dev_by_three(number):
-    if number % 3 == 0:
-        return 'Да'
-    else:
-        return 'Нет'
+    return "Да" if number % 3 == 0 else "Нет"
 
-
-num = 9 
+num = int(input("Введите число: "))
 result = dev_by_three(num)
 
-print(f"Делится ли на три ({num})? - {result}.")
+print(f"Делится ли на три {num}? - {result}")
