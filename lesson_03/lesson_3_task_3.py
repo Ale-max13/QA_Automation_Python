@@ -11,3 +11,5 @@ print(
     f"{mail.from_address.city}, {mail.from_address.street}, "
     f"{mail.from_address.house} - {mail.from_address.apartment}"
 )
+
+print(f"Стоимость отправления: {mail.cost} рублей")
