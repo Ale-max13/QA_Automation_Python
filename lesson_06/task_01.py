@@ -6,7 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 driver = webdriver.Chrome()
 
 try:
-    driver.get("https://uitestingplayground.com/ajax")
+    driver.get("http://uitestingplayground.com/ajax")
 
     button = driver.find_element(By.CSS_SELECTOR, "button#ajaxButton")
     button.click()
