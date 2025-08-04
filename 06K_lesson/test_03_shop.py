@@ -1,34 +1,56 @@
 import pytest
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox.service import Service
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-def test_shop_purchase():
-    driver = webdriver.Firefox()
-    driver.get("https://www.saucedemo.com/")
 
-    wait = WebDriverWait(driver, 10)
+@pytest.fixture
+def driver():
+    options = Options()
+    options.binary_location = r"C:\Program Files\Mozilla Firefox\firefox.exe"
+    service = Service('geckodriver.exe')
+    driver = webdriver.Firefox(service=service, options=options)
+    yield driver
+    driver.quit()
 
-    wait.until(EC.presence_of_element_located((By.ID, "user-name"))).send_keys("standard_user")
+
+def test_shop_total(driver):
+    url = "https://www.saucedemo.com/"
+    driver.get(url)
+
+    WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.ID, "user-name"))
+    )
+    driver.find_element(By.ID, "user-name").send_keys("standard_user")
     driver.find_element(By.ID, "password").send_keys("secret_sauce")
     driver.find_element(By.ID, "login-button").click()
 
-    wait.until(EC.presence_of_element_located((By.CLASS_NAME, "inventory_item")))
+    WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.CLASS_NAME, "inventory_item"))
+    )
     driver.find_element(By.ID, "add-to-cart-sauce-labs-backpack").click()
     driver.find_element(By.ID, "add-to-cart-sauce-labs-bolt-t-shirt").click()
     driver.find_element(By.ID, "add-to-cart-sauce-labs-onesie").click()
 
     driver.find_element(By.CLASS_NAME, "shopping_cart_link").click()
-    wait.until(EC.element_to_be_clickable((By.ID, "checkout"))).click()
+    WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.ID, "checkout"))
+    )
+    driver.find_element(By.ID, "checkout").click()
 
-    wait.until(EC.presence_of_element_located((By.ID, "first-name"))).send_keys("Alena")
-    driver.find_element(By.ID, "last-name").send_keys("Testova")
+    WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.ID, "first-name"))
+    )
+    driver.find_element(By.ID, "first-name").send_keys("Иван")
+    driver.find_element(By.ID, "last-name").send_keys("Петров")
     driver.find_element(By.ID, "postal-code").send_keys("123456")
     driver.find_element(By.ID, "continue").click()
 
-    total_elem = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "summary_total_label")))
-    total_text = total_elem.text
-    assert "$58.29" in total_text, f"Ожидалось $58.29, но получили: {total_text}"
-
-    driver.quit()
+    WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.CLASS_NAME, "summary_total_label"))
+    )
+    total = driver.find_element(By.CLASS_NAME, "summary_total_label").text
+    assert "$58.29" in total, f"Сумма заказа отличается! Факт: {total}"
