@@ -1,26 +1,49 @@
+import pytest
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.edge.service import Service
+from selenium.webdriver.edge.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
-import time
+from selenium.webdriver.support import expected_conditions as EC
 
 
-def test_form_validation():
-    service = Service(executable_path="drivers/msedgedriver.exe")
-    driver = webdriver.Edge(service=service)
-    wait = WebDriverWait(driver, 10)
-
-    driver.get("https://bonigarcia.dev/selenium-webdriver-java/data-types.html")
-
-    driver.find_element(By.NAME, "first-name").send_keys("Иван")
-    driver.find_element(By.NAME, "last-name").send_keys("Петров")
-    driver.find_element(By.NAME, "address").send_keys("Ленина, 55-3")
-    driver.find_element(By.CSS_SELECTOR, "input[type='email']").send_keys("test@skypro.com")
-    driver.find_element(By.NAME, "phone").send_keys("+798589998787")
-    driver.find_element(By.NAME, "city").send_keys("Москва")
-    driver.find_element(By.NAME, "country").send_keys("Россия")
-    driver.find_element(By.NAME, "job-position").send_keys("QA")
-    driver.find_element(By.NAME, "company").send_keys("SkyPro")
-
-    time.sleep(15)
+@pytest.fixture
+def driver():
+    options = Options()
+    service = Service('msedgedriver.exe')
+    driver = webdriver.Edge(service=service, options=options)
+    yield driver
     driver.quit()
+
+
+def test_form_validation(driver):
+    driver.get(
+        "https://bonigarcia.dev/selenium-webdriver-java/data-types.html"
+    )
+
+    fields = {
+        "first-name": "Иван",
+        "last-name": "Петров",
+        "address": "Ленина, 55-3",
+        "e-mail": "test@skypro.com",
+        "phone": "+79588998877",
+        "city": "Москва",
+        "country": "Россия",
+        "job-position": "QA",
+        "company": "SkyPro"
+    }
+
+    for name, value in fields.items():
+        el = driver.find_element(By.NAME, name)
+        el.clear()
+        el.send_keys(value)
+
+    driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
+    zip_code_div = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.ID, "zip-code"))
+    )
+
+    assert zip_code_div.text.strip() == "N/A", \
+        "Zip code не равен 'N/A'!"
+    assert "alert-danger" in zip_code_div.get_attribute("class"), \
+        "Zip code не подсвечен красным (нет класса alert-danger)!"
