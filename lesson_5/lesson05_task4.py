@@ -18,4 +18,7 @@ message = driver.find_element(By.ID, "flash")
 print(message.text.strip())
 
 time.sleep(2)
-driver.quit()
+driver.quit() 
+
+# Альтернатива без переменной:
+# driver.find_element(By.ID, "username").send_keys("tomsmith")
