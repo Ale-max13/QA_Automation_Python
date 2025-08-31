@@ -3,18 +3,31 @@ import uuid
 import requests
 import pytest
 
-BASE_URL = os.getenv("YOUGILE_BASE_URL", "https://ru.yougile.com/api-v2").rstrip("/")
+
+BASE_URL = os.getenv(
+    "YOUGILE_BASE_URL",
+    "https://ru.yougile.com/api-v2",
+).rstrip("/")
 TOKEN = os.getenv("YOUGILE_TOKEN")
+HEADERS = {"Authorization": f"Bearer {TOKEN}"} if TOKEN else {}
 
 if not TOKEN:
-    pytest.skip("YOUGILE_TOKEN не задан (export/set перед запуском тестов).", allow_module_level=True)
-
-HEADERS = {"Authorization": f"Bearer {TOKEN}"}
+    pytest.skip(
+        "YOUGILE_TOKEN не задан (export/set перед запуском тестов).",
+        allow_module_level=True,
+    )
 
 
 def test_update_project_put():
-    create_payload = {"title": f"autotest_{uuid.uuid4().hex[:8]}", "users": {}}
-    r_create = requests.post(f"{BASE_URL}/projects", json=create_payload, headers=HEADERS)
+    create_payload = {
+        "title": f"autotest_{uuid.uuid4().hex[:8]}",
+        "users": {},
+    }
+    r_create = requests.post(
+        f"{BASE_URL}/projects",
+        json=create_payload,
+        headers=HEADERS,
+    )
     assert r_create.status_code == 201, r_create.text
     project_id = r_create.json()["id"]
 
@@ -36,5 +49,3 @@ def test_update_project_put__404_unknown_id():
         headers=HEADERS,
     )
     assert r.status_code == 404, r.text
-
-
