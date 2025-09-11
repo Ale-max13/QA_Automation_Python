@@ -1,6 +1,8 @@
+import allure
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.remote.webdriver import WebDriver
 
 
 class SlowCalculatorPage:
@@ -9,11 +11,17 @@ class SlowCalculatorPage:
     DELAY_FIELD = (By.ID, "delay")
     RESULT_FIELD = (By.CSS_SELECTOR, ".screen")
 
-    def __init__(self, driver):
+    def __init__(self, driver: WebDriver) -> None:
+        """Конструктор страницы калькулятора.
+
+        :param driver: экземпляр Selenium WebDriver.
+        """
         self.driver = driver
         self.wait = WebDriverWait(driver, 60)
 
-    def open(self):
+    @allure.step("Открываем страницу калькулятора")
+    def open(self) -> None:
+        """Открывает страницу калькулятора."""
         self.driver.get(self.URL)
 
     def set_delay(self, seconds: int):
@@ -40,3 +48,4 @@ class SlowCalculatorPage:
 
     def wait_for_result(self, expected: str):
         self.wait.until(lambda d: self.get_result() == expected)
+
