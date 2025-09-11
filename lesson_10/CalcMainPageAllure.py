@@ -52,7 +52,12 @@ class SlowCalculatorPage:
         )
         btn.click()
 
+    @allure.step("Получаем результат с экрана калькулятора")
     def get_result(self) -> str:
+        """Возвращает результат с экрана калькулятора.
+
+        :return: str — текст результата с экрана калькулятора.
+        """
         result_elem = self.wait.until(
             EC.visibility_of_element_located(self.RESULT_FIELD)
         )
