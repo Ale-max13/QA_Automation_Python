@@ -63,5 +63,11 @@ class SlowCalculatorPage:
         )
         return result_elem.text.strip()
 
-    def wait_for_result(self, expected: str):
+    @allure.step("Ожидаем появления результата: {expected}")
+    def wait_for_result(self, expected: str) -> None:
+        """Ждёт, пока на экране калькулятора появится ожидаемый результат.
+
+        :param expected: str — ожидаемый результат.
+        :return: None
+        """
         self.wait.until(lambda d: self.get_result() == expected)
