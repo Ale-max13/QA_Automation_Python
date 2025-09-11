@@ -24,7 +24,13 @@ class SlowCalculatorPage:
         """Открывает страницу калькулятора."""
         self.driver.get(self.URL)
 
-    def set_delay(self, seconds: int):
+    @allure.step("Устанавливаем задержку: {seconds} сек")
+    def set_delay(self, seconds: int) -> None:
+        """Устанавливает задержку выполнения операции на калькуляторе.
+
+        :param seconds: задержка в секундах.
+        :return: None
+        """
         delay_input = self.wait.until(
             EC.presence_of_element_located(self.DELAY_FIELD)
         )
@@ -48,4 +54,3 @@ class SlowCalculatorPage:
 
     def wait_for_result(self, expected: str):
         self.wait.until(lambda d: self.get_result() == expected)
-
