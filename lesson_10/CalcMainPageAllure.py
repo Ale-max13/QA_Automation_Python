@@ -40,7 +40,13 @@ class SlowCalculatorPage:
     def _button_locator(self, label: str):
         return (By.XPATH, f"//span[normalize-space()='{label}']")
 
-    def click_button(self, label: str):
+    @allure.step("Нажимаем кнопку: {label}")
+    def click_button(self, label: str) -> None:
+        """Нажимает кнопку калькулятора.
+
+        :param label: str — текст на кнопке, которую нужно нажать.
+        :return: None
+        """
         btn = self.wait.until(
             EC.element_to_be_clickable(self._button_locator(label))
         )
