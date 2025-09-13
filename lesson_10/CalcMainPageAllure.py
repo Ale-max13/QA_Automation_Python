@@ -1,0 +1,73 @@
+import allure
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.remote.webdriver import WebDriver
+
+
+class SlowCalculatorPage:
+    URL = "https://bonigarcia.dev/selenium-webdriver-java/slow-calculator.html"
+
+    DELAY_FIELD = (By.ID, "delay")
+    RESULT_FIELD = (By.CSS_SELECTOR, ".screen")
+
+    def __init__(self, driver: WebDriver) -> None:
+        """Конструктор страницы калькулятора.
+
+        :param driver: экземпляр Selenium WebDriver.
+        """
+        self.driver = driver
+        self.wait = WebDriverWait(driver, 60)
+
+    @allure.step("Открываем страницу калькулятора")
+    def open(self) -> None:
+        """Открывает страницу калькулятора."""
+        self.driver.get(self.URL)
+
+    @allure.step("Устанавливаем задержку: {seconds} сек")
+    def set_delay(self, seconds: int) -> None:
+        """Устанавливает задержку выполнения операции на калькуляторе.
+
+        :param seconds: задержка в секундах.
+        :return: None
+        """
+        delay_input = self.wait.until(
+            EC.presence_of_element_located(self.DELAY_FIELD)
+        )
+        delay_input.clear()
+        delay_input.send_keys(str(seconds))
+
+    def _button_locator(self, label: str):
+        return (By.XPATH, f"//span[normalize-space()='{label}']")
+
+    @allure.step("Нажимаем кнопку: {label}")
+    def click_button(self, label: str) -> None:
+        """Нажимает кнопку калькулятора.
+
+        :param label: str — текст на кнопке, которую нужно нажать.
+        :return: None
+        """
+        btn = self.wait.until(
+            EC.element_to_be_clickable(self._button_locator(label))
+        )
+        btn.click()
+
+    @allure.step("Получаем результат с экрана калькулятора")
+    def get_result(self) -> str:
+        """Возвращает результат с экрана калькулятора.
+
+        :return: str — текст результата с экрана калькулятора.
+        """
+        result_elem = self.wait.until(
+            EC.visibility_of_element_located(self.RESULT_FIELD)
+        )
+        return result_elem.text.strip()
+
+    @allure.step("Ожидаем появления результата: {expected}")
+    def wait_for_result(self, expected: str) -> None:
+        """Ждёт, пока на экране калькулятора появится ожидаемый результат.
+
+        :param expected: str — ожидаемый результат.
+        :return: None
+        """
+        self.wait.until(lambda d: self.get_result() == expected)
